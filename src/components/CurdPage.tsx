@@ -69,6 +69,7 @@ export declare type IField = {
   name?: string;
   code?: string;
   type?: string;
+  initial?: any;
   responsive?: Breakpoint[];
   rules?: any[];
   style?: {
@@ -85,7 +86,7 @@ export declare type IField = {
 export declare type IFields = IField[];
 
 export declare type IStatus = 'search' | 'add' | 'edit' | 'view' | string;
-export declare type IAddStatus = 'base' | 'property';
+export declare type ISubPageStatus = 'base' | 'property';
 
 export declare type IPage = {
   current: number;
@@ -182,9 +183,9 @@ const CurdPage: FC<{
   };
 
   //页面状态
-  const [status, setStatus] = useState<IStatus>('search');
+  const [pageStatus, setPageStatus] = useState<IStatus>('search');
   //新增页面状态
-  const [addStatus, setAddStatus] = useState<IAddStatus>('base');
+  const [subPageStatus, setSubPageStatus] = useState<ISubPageStatus>('base');
   //列表选择
   const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
   //删除确认弹窗
@@ -346,7 +347,7 @@ const CurdPage: FC<{
         extendData?.forEach((item: any) => {
           item.clear();
         });
-        setStatus('search');
+        setPageStatus('search');
         pageListRequest.run(page, query);
         //需要刷新的api
         refresh?.forEach((item: any) => {
@@ -378,8 +379,8 @@ const CurdPage: FC<{
           item.setData(data[item.key]);
           item.setDisable(nextStatus == 'view');
         });
-        setStatus(nextStatus);
-        setAddStatus('base');
+        setPageStatus(nextStatus);
+        setSubPageStatus('base');
       },
     },
   );
@@ -422,12 +423,12 @@ const CurdPage: FC<{
   }, [query]);
 
   useEffect(() => {
-    if (extendOptionPage == undefined && status != 'search') {
-      setStatus('search');
+    if (extendOptionPage == undefined && pageStatus != 'search') {
+      setPageStatus('search');
       pageListRequest.run(page, query);
     }
-    if (extendOptionPage != undefined && extendOptionPage.key != status) {
-      setStatus(extendOptionPage.key);
+    if (extendOptionPage != undefined && extendOptionPage.key != pageStatus) {
+      setPageStatus(extendOptionPage.key);
     }
   }, [extendOptionPage]);
   // ======useEffect end======
@@ -437,7 +438,7 @@ const CurdPage: FC<{
   const queryChange = (changedValues: any, allValues: any) => {
     if (allValues) {
       for (let key of Object.keys(allValues)) {
-        if (allValues[key] == '') {
+        if (allValues[key] === '') {
           allValues[key] = undefined;
         }
       }
@@ -465,8 +466,8 @@ const CurdPage: FC<{
       item.clear();
       item.setDisable(false);
     });
-    setStatus('add');
-    setAddStatus('base');
+    setPageStatus('add');
+    setSubPageStatus('base');
   };
   //新增确认按钮
   const addSubmitClick = (values: any) => {
@@ -478,7 +479,7 @@ const CurdPage: FC<{
   };
   //显示条件分页界面
   const openFirstPage = () => {
-    setStatus('search');
+    setPageStatus('search');
   };
   //修改按钮
   const eidtClick = () => {
@@ -513,16 +514,16 @@ const CurdPage: FC<{
   const getStyle = (item: IField) => {
     //未声明或者指定显示
     let style = undefined;
-    if (status == 'search' && item.style && item.style.search) {
+    if (pageStatus == 'search' && item.style && item.style.search) {
       style = item.style.search;
     }
-    if (status == 'add' && item.style && item.style.add) {
+    if (pageStatus == 'add' && item.style && item.style.add) {
       style = item.style.add;
     }
-    if (status == 'edit' && item.style && item.style.edit) {
+    if (pageStatus == 'edit' && item.style && item.style.edit) {
       style = item.style.edit;
     }
-    if (status == 'view' && item.style && item.style.view) {
+    if (pageStatus == 'view' && item.style && item.style.view) {
       style = item.style.view;
     }
     return style;
@@ -531,14 +532,16 @@ const CurdPage: FC<{
   const formItem = (
     item: IField,
     style?: IStyle,
-    displayAddStatus?: IAddStatus,
+    displaySubPageStatus?: ISubPageStatus,
   ) => {
     //判断是否需要render
     if (style != undefined && style.display == false) {
       return;
     }
     //判断在那个页面显示
-    let hidden = displayAddStatus ? displayAddStatus != addStatus : false;
+    let hidden = displaySubPageStatus
+      ? displaySubPageStatus != subPageStatus
+      : false;
     if (style != undefined && style.hidden == true) {
       hidden = true;
     }
@@ -546,7 +549,8 @@ const CurdPage: FC<{
     if (style != undefined && style.disable == true) {
       disable = true;
     }
-    if (status == 'view') {
+    //详情页面全部不可修改
+    if (pageStatus == 'view') {
       disable = true;
     }
 
@@ -560,7 +564,7 @@ const CurdPage: FC<{
     else if (item.type == 'select' && item.select != undefined) {
       content = (
         <Select
-          style={{ minWidth: style?.width ? style.width : 100 }}
+          style={{ minWidth: style?.width ? style.width : 150 }}
           disabled={disable}
           allowClear
         >
@@ -615,7 +619,8 @@ const CurdPage: FC<{
         name={item.code}
         key={item.code}
         hidden={hidden}
-        rules={status == 'search' ? [] : item.rules}
+        initialValue={item.initial}
+        rules={pageStatus == 'search' ? [] : item.rules}
       >
         {content}
       </Form.Item>
@@ -783,10 +788,10 @@ const CurdPage: FC<{
   //标题
   let addTitle = '新增';
 
-  if (status == 'edit') {
+  if (pageStatus == 'edit') {
     addTitle = '修改';
   }
-  if (status == 'view') {
+  if (pageStatus == 'view') {
     addTitle = '详情';
     addOptionNodes = (
       <Form.Item>
@@ -900,7 +905,7 @@ const CurdPage: FC<{
   console.log('query', query);
 
   //新增页面
-  if (status == 'add' || status == 'edit' || status == 'view') {
+  if (pageStatus == 'add' || pageStatus == 'edit' || pageStatus == 'view') {
     return (
       <div className="cms-main">
         <PageHeader
@@ -911,10 +916,10 @@ const CurdPage: FC<{
           extra={[
             <Button
               key="1"
-              type={addStatus == 'base' ? 'primary' : 'default'}
+              type={subPageStatus == 'base' ? 'primary' : 'default'}
               icon={<ProfileOutlined />}
               onClick={() => {
-                setAddStatus('base');
+                setSubPageStatus('base');
               }}
               shape="round"
             >
@@ -922,10 +927,10 @@ const CurdPage: FC<{
             </Button>,
             <Button
               key="2"
-              type={addStatus == 'property' ? 'primary' : 'default'}
+              type={subPageStatus == 'property' ? 'primary' : 'default'}
               icon={<ControlOutlined />}
               onClick={() => {
-                setAddStatus('property');
+                setSubPageStatus('property');
               }}
               shape="round"
             >
@@ -935,7 +940,7 @@ const CurdPage: FC<{
         >
           <Form
             initialValues={entityData}
-            name={status + '_' + addStatus}
+            name={pageStatus + '_' + subPageStatus}
             {...formLayout}
             onFinish={addSubmitClick}
             autoComplete="off"
@@ -949,7 +954,7 @@ const CurdPage: FC<{
     );
   }
 
-  if (status == 'search') {
+  if (pageStatus == 'search') {
     return (
       <div className="cms-main">
         <div className="cms-query">

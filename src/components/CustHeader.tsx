@@ -1,6 +1,5 @@
 import React, { FC } from 'react';
 
-import './Home/less/antMotionStyle.less';
 import { Menu, Divider, Row, Col, Avatar } from 'antd';
 import { Link, useModel } from 'umi';
 import Loading from './Loading';
