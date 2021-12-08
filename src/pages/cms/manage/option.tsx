@@ -1,56 +1,47 @@
 import { FC, useState } from 'react';
 import CurdPage, { IFields } from '@/components/CurdPage';
+import AuthEntityPage from '@/components/AuthEntityPage';
+import { useRequest } from 'umi';
+import { baseList } from '@/services/base';
 
-const Option: FC = (props: any) => {
+const CmsOption: FC = (props: any) => {
   const fields: IFields = [
     {
-      name: '主键',
-      code: 'id',
-      type: 'number',
-      style: {
-        search: { display: false },
-        table: { display: false },
-        add: { hidden: true },
-        edit: { hidden: true },
-      },
-    },
-
-    {
+      subPage: 'base',
       name: '操作名称',
       code: 'name',
       type: 'string',
-      rules: [{ required: true }],
+      style: { search: { display: true } },
+      rules: [{ required: true }, { type: 'string', max: 50 }],
     },
     {
-      name: '操作字符',
+      subPage: 'base',
+      name: '操作字符串',
       code: 'code',
       type: 'string',
-      rules: [{ required: true }],
-      style: {
-        search: { display: false },
-      },
+      style: { search: { display: true } },
+      rules: [{ required: true }, { type: 'string', max: 100 }],
     },
-
     {
-      name: '状态',
-      code: 'deleted',
-      type: 'select',
-      select: [
-        { code: '0', name: '启用', color: 'green' },
-        { code: '1', name: '停用', color: 'red' },
-      ],
+      subPage: 'base',
+      name: '备注',
+      code: 'remark',
+      type: 'string',
+      style: { search: { display: false }, table: { display: false } },
+      rules: [{ type: 'string', max: 500 }],
     },
   ];
 
   return (
-    <CurdPage
+    <AuthEntityPage
       model="cms"
       entity="option"
-      pageTitle="操作页面"
+      pageTitle="操作类型页面"
       fields={fields}
+      option={['add', 'edit', 'delete']}
     />
   );
 };
 // @ts-ignore
-Option.title = '操作页面';
-export default Option;
+CmsOption.title = '操作类型页面';
+export default CmsOption;

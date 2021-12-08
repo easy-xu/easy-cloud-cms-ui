@@ -21,7 +21,11 @@ export function basePageList(
 export function baseList(model: string, entity: string, query: any) {
   return postRequest(`/${model}/${entity}/list`, query);
 }
-//详情查询接口
+//主键查询接口
+export function baseGetEntity(model: string, entity: string, id: number) {
+  return postRequest(`/${model}/${entity}/get`, { id: id });
+}
+//查询接口
 export function baseQueryEntity(model: string, entity: string, id: number) {
   return postRequest(`/${model}/${entity}/query`, { id: id });
 }
