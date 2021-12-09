@@ -8,7 +8,8 @@ import {
   Select,
   Table,
   Space,
-  Card,
+  Checkbox,
+  Tree,
   Tag,
   Modal,
   Tabs,
@@ -36,6 +37,7 @@ import {
 import Loading from './Loading';
 import { cmsQueryOptionAuth } from '@/services/cms';
 import Markdown from './Markdown';
+import FormTree, { ITree } from './FormTree';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -82,6 +84,9 @@ export declare type IField = {
     view?: IStyle;
   };
   select?: IOption[];
+  checks?: IOption[];
+  radio?: IOption[];
+  tree?: ITree[];
   node?: ReactElement;
 };
 
@@ -139,41 +144,18 @@ const CurdPage: FC<ICurdPage> = ({
   model,
   entity,
   pageTitle,
-  fields,
-  queryEntityApi,
-  pageListApi,
-  saveEntityApi,
-  deleteEntityApi,
-  queryOptionAuthApi,
+  fields = [],
+  queryEntityApi = baseGetEntity,
+  pageListApi = basePageList,
+  saveEntityApi = baseSaveEntity,
+  deleteEntityApi = baseDeleteEntity,
+  queryOptionAuthApi = cmsQueryOptionAuth,
   refresh,
-  option,
-  extendData,
-  extendOption,
+  option = ['add', 'edit', 'delete'],
+  extendData = [],
+  extendOption = [],
   extendOptionPage,
 }) => {
-  if (option == undefined) {
-    option = ['add', 'edit', 'delete'];
-  }
-  if (extendOption == undefined) {
-    extendOption = [];
-  }
-
-  if (queryEntityApi == undefined) {
-    queryEntityApi = baseGetEntity;
-  }
-  if (pageListApi == undefined) {
-    pageListApi = basePageList;
-  }
-  if (saveEntityApi == undefined) {
-    saveEntityApi = baseSaveEntity;
-  }
-  if (deleteEntityApi == undefined) {
-    deleteEntityApi = baseDeleteEntity;
-  }
-  if (queryOptionAuthApi == undefined) {
-    queryOptionAuthApi = cmsQueryOptionAuth;
-  }
-
   const initPata = {
     current: 1,
     pageSize: default_pageSize,
@@ -402,6 +384,9 @@ const CurdPage: FC<ICurdPage> = ({
       return;
     }
     //判断在那个子页面显示
+    if (!item.subPage) {
+      item.subPage = 'base';
+    }
     let hidden = pageStatus == 'search' ? false : subPageStatus != item.subPage;
 
     if (style != undefined && style.hidden == true) {
@@ -443,19 +428,36 @@ const CurdPage: FC<ICurdPage> = ({
     }
 
     //单选框
-    else if (item.type == 'radio' && item.select != undefined) {
+    else if (item.type == 'radio' && item.radio != undefined) {
       content = (
-        <Radio.Group name={item.name}>
-          {item.select.map((option: IOption) => {
+        <Radio.Group name={item.name} disabled={disable}>
+          {item.radio.map((option: IOption) => {
             return (
               <Radio key={option.code} value={option.code}>
-                {' '}
                 {option.node ? option.node : option.name}
               </Radio>
             );
           })}
         </Radio.Group>
       );
+    }
+    //多选框
+    else if (item.type == 'checks' && item.checks != undefined) {
+      content = (
+        <Checkbox.Group name={item.name} disabled={disable}>
+          {item.checks.map((option: IOption) => {
+            return (
+              <Checkbox key={option.code} value={option.code}>
+                {option.node ? option.node : option.name}
+              </Checkbox>
+            );
+          })}
+        </Checkbox.Group>
+      );
+    }
+    //树
+    else if (item.type == 'tree' && item.tree != undefined) {
+      content = <FormTree disabled={disable} treeData={item.tree} />;
     }
 
     //markdown
@@ -758,7 +760,7 @@ const CurdPage: FC<ICurdPage> = ({
   // ======render node end======
 
   //debug
-  console.log(model + '-' + entity + ' page render');
+  console.log('page render', model + '-' + entity);
   console.log('entity', entityData);
   console.log('query', query);
   console.log('fields', fields);

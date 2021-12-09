@@ -2,31 +2,27 @@ import { FC, useState } from 'react';
 import CurdPage, { IFields } from '@/components/CurdPage';
 import BaseEntityPage from '@/components/BaseEntityPage';
 import { useRequest } from 'umi';
-import { baseList } from '@/services/base';
+import { baseList, baseTree } from '@/services/base';
+import { toTreeData, toListData } from '@/utils/baseUtil';
 
 const JobLog: FC = (props: any) => {
-  const [jobIds, setJobIds] = useState<any>([]);
-  const jobIdsRequest = useRequest(() => baseList('job', 'config', {}), {
+  const [jobId, setJobId] = useState<any>([]);
+  const jobIdRequest = useRequest(() => baseList('job', 'config', {}), {
     onSuccess: (data) => {
-      let jobIds = data.map((item: any) => {
-        return { code: item.id, name: item.name };
-      });
-      setJobIds(jobIds);
+      setJobId(toListData(data, 'id', 'name'));
     },
   });
 
   const fields: IFields = [
     {
-      subPage: 'base',
       name: '任务',
       code: 'jobId',
       type: 'select',
-      select: jobIds,
+      select: jobId,
       style: { search: { display: true } },
       rules: [{ required: true }],
     },
     {
-      subPage: 'base',
       name: '日志分类',
       code: 'type',
       type: 'select',
@@ -38,14 +34,12 @@ const JobLog: FC = (props: any) => {
       style: { search: { display: false } },
     },
     {
-      subPage: 'base',
       name: '执行时间',
       code: 'execTime',
       type: 'datetime',
       style: { search: { display: false } },
     },
     {
-      subPage: 'base',
       name: '执行结果',
       code: 'execCode',
       type: 'select',
@@ -57,7 +51,6 @@ const JobLog: FC = (props: any) => {
       style: { search: { display: false } },
     },
     {
-      subPage: 'base',
       name: '执行结果描述',
       code: 'execContent',
       type: 'string',

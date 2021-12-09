@@ -2,12 +2,12 @@ import { FC, useState } from 'react';
 import CurdPage, { IFields } from '@/components/CurdPage';
 import BaseEntityPage from '@/components/BaseEntityPage';
 import { useRequest } from 'umi';
-import { baseList } from '@/services/base';
+import { baseList, baseTree } from '@/services/base';
+import { toTreeData, toListData } from '@/utils/baseUtil';
 
 const SysOptionLog: FC = (props: any) => {
   const fields: IFields = [
     {
-      subPage: 'base',
       name: '用户编号',
       code: 'userNo',
       type: 'string',
@@ -15,7 +15,6 @@ const SysOptionLog: FC = (props: any) => {
       rules: [{ type: 'string', max: 60 }],
     },
     {
-      subPage: 'base',
       name: '设备编号',
       code: 'deviceNo',
       type: 'string',
@@ -23,7 +22,6 @@ const SysOptionLog: FC = (props: any) => {
       rules: [{ type: 'string', max: 60 }],
     },
     {
-      subPage: 'base',
       name: '操作名称',
       code: 'optionName',
       type: 'string',

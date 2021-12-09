@@ -2,12 +2,12 @@ import { FC, useState } from 'react';
 import CurdPage, { IFields } from '@/components/CurdPage';
 import AuthEntityPage from '@/components/AuthEntityPage';
 import { useRequest } from 'umi';
-import { baseList } from '@/services/base';
+import { baseList, baseTree } from '@/services/base';
+import { toTreeData, toListData } from '@/utils/baseUtil';
 
 const CmsGroup: FC = (props: any) => {
   const fields: IFields = [
     {
-      subPage: 'base',
       name: '分组名称',
       code: 'name',
       type: 'string',
@@ -15,7 +15,6 @@ const CmsGroup: FC = (props: any) => {
       rules: [{ required: true }, { type: 'string', max: 30 }],
     },
     {
-      subPage: 'base',
       name: '分组字符串',
       code: 'code',
       type: 'string',
@@ -23,7 +22,6 @@ const CmsGroup: FC = (props: any) => {
       rules: [{ required: true }, { type: 'string', max: 100 }],
     },
     {
-      subPage: 'base',
       name: '备注',
       code: 'remark',
       type: 'string',
