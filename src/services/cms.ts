@@ -1,6 +1,6 @@
 import { getRequest, postRequest } from '@/utils/api';
 
-//首次访问获取用户id
+//首次访问
 export function initDevice() {
   return getRequest('/cms/user/device');
 }
@@ -24,8 +24,8 @@ export function cmsMenuTree(params: any) {
 }
 
 //查询当前用户指定菜单操作权限
-export function cmsQueryOptionAuth(menuCode: string) {
-  return postRequest(`/cms/auth/user-menu-option`, { menuCode: menuCode });
+export function cmsQueryOptionAuth(code: string) {
+  return postRequest(`/cms/user/menu-option`, { code: code });
 }
 //重置密码
 export function cmsResetPassword(params: any) {
