@@ -18,11 +18,6 @@ export function signinRequest(params: any) {
   return postRequest('/cms/user/signIn', params);
 }
 
-//菜单树接口
-export function cmsMenuTree(params: any) {
-  return postRequest('/cms/menu/tree', params);
-}
-
 //查询当前用户指定菜单操作权限
 export function cmsQueryOptionAuth(code: string) {
   return postRequest(`/cms/user/menu-option`, { code: code });

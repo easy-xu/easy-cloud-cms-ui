@@ -13,10 +13,10 @@ import * as Icon from '@ant-design/icons';
 const { Sider, Content, Footer, Header } = Layout;
 const { SubMenu } = Menu;
 import './index.less';
-import { cmsMenuTree } from '@/services/cms';
 import Loading from '@/components/Loading';
 import CustHeader from '@/components/CustHeader';
 import FixRow from '@/components/FixRow';
+import { baseTree } from '@/services/base';
 
 const CmsLayout: FC<IRouteComponentProps> = ({
   children,
@@ -41,24 +41,20 @@ const CmsLayout: FC<IRouteComponentProps> = ({
   const [notAuth, setNotAuth] = useState<boolean>(false);
   const [small, setSmall] = useState<boolean>(false);
 
-  const menuTreeRequest = useRequest(
-    () => cmsMenuTree({ userNo: user.userNo }),
-    //() => cmsMenuTree({}),
-    {
-      manual: true,
-      onSuccess: (data) => {
-        setMenuTree(data);
-        const paths = getPath(data, '/cms');
-        //判断是否分配菜单
-        if (
-          paths.indexOf(location.pathname) == -1 &&
-          location.pathname != '/cms'
-        ) {
-          setNotAuth(true);
-        }
-      },
+  const menuTreeRequest = useRequest(() => baseTree('cms', 'menu', {}), {
+    manual: true,
+    onSuccess: (data) => {
+      setMenuTree(data);
+      const paths = getPath(data, '/cms');
+      //判断是否分配菜单
+      if (
+        paths.indexOf(location.pathname) == -1 &&
+        location.pathname != '/cms'
+      ) {
+        setNotAuth(true);
+      }
     },
-  );
+  });
 
   useEffect(() => {
     menuTreeRequest.run();
