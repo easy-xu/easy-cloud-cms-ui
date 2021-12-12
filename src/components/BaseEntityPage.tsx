@@ -86,6 +86,7 @@ const BaseEntityPage: FC<ICurdPage> = (props) => {
         add: { display: false },
         edit: { display: false },
         search: { display: false },
+        table: { display: false },
       },
     },
   ];

@@ -17,8 +17,11 @@ export function baseList(model: string, entity: string, query: any) {
   return postRequest(`/${model}/${entity}/list`, query);
 }
 //新增接口
-export function baseSaveEntity(model: string, entity: string, params: any) {
-  return postRequest(`/${model}/${entity}/save`, params);
+export function baseAddEntity(model: string, entity: string, params: any) {
+  return postRequest(`/${model}/${entity}/add`, params);
+}
+export function baseEditEntity(model: string, entity: string, params: any) {
+  return postRequest(`/${model}/${entity}/edit`, params);
 }
 //主键查询接口
 export function baseGetEntity(model: string, entity: string, id: number) {

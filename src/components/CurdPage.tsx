@@ -28,7 +28,8 @@ import { useRequest } from 'umi';
 import FixRow from '@/components/FixRow';
 import {
   basePageList,
-  baseSaveEntity,
+  baseEditEntity,
+  baseAddEntity,
   baseDeleteEntity,
   baseQueryEntity,
   baseList,
@@ -108,7 +109,8 @@ export declare type ICurdPage = {
   fields: IFields;
   queryEntityApi?: any;
   pageListApi?: any;
-  saveEntityApi?: any;
+  addEntityApi?: any;
+  editEntityApi?: any;
   deleteEntityApi?: any;
   queryOptionAuthApi?: any;
   refresh?: any[];
@@ -147,7 +149,8 @@ const CurdPage: FC<ICurdPage> = ({
   fields = [],
   queryEntityApi = baseGetEntity,
   pageListApi = basePageList,
-  saveEntityApi = baseSaveEntity,
+  addEntityApi = baseAddEntity,
+  editEntityApi = baseEditEntity,
   deleteEntityApi = baseDeleteEntity,
   queryOptionAuthApi = cmsQueryOptionAuth,
   refresh,
@@ -185,24 +188,37 @@ const CurdPage: FC<ICurdPage> = ({
   const [optionAuth, setOptionAuth] = useState<any[]>([]);
 
   // ======useRequest start======
+  //查询页面刷新
+  const doReSearch = () => {
+    setEntityData({});
+    setSelectedRowKeys([]);
+    //清除父组件数据
+    extendData?.forEach((item: any) => {
+      item.clear();
+    });
+    setPageStatus('search');
+    pageListRequest.run(page, query);
+    //需要刷新的api
+    refresh?.forEach((item: any) => {
+      item.run();
+    });
+  };
   //新增或保存
-  const saveEntiyRequest = useRequest(
-    (params) => saveEntityApi(model, entity, params),
+  const addEntiyRequest = useRequest(
+    (params) => addEntityApi(model, entity, params),
     {
       manual: true,
       onSuccess: (data) => {
-        setEntityData({});
-        setSelectedRowKeys([]);
-        //清除父组件数据
-        extendData?.forEach((item: any) => {
-          item.clear();
-        });
-        setPageStatus('search');
-        pageListRequest.run(page, query);
-        //需要刷新的api
-        refresh?.forEach((item: any) => {
-          item.run();
-        });
+        doReSearch();
+      },
+    },
+  );
+  const editEntiyRequest = useRequest(
+    (params) => editEntityApi(model, entity, params),
+    {
+      manual: true,
+      onSuccess: (data) => {
+        doReSearch();
       },
     },
   );
@@ -318,13 +334,18 @@ const CurdPage: FC<ICurdPage> = ({
     setPageStatus('add');
     setSubPageStatus('base');
   };
-  //新增确认按钮
-  const addSubmitClick = (values: any) => {
+  //新增或修改确认按钮
+  const pageSubmitClick = (values: any) => {
     //补充父组件数据
     extendData?.forEach((item: any) => {
       values[item.key] = item.data;
     });
-    saveEntiyRequest.run(values);
+    if (pageStatus == 'add') {
+      addEntiyRequest.run(values);
+    }
+    if (pageStatus == 'edit') {
+      editEntiyRequest.run(values);
+    }
   };
   //显示条件分页界面
   const openFirstPage = () => {
@@ -472,6 +493,10 @@ const CurdPage: FC<ICurdPage> = ({
     //密码
     else if (item.type == 'password') {
       content = <Input.Password readOnly={disable} />;
+    }
+    //文本域
+    else if (item.type == 'textarea') {
+      content = <Input.TextArea readOnly={disable} />;
     }
     //默认普通输入框
     else {
@@ -684,6 +709,7 @@ const CurdPage: FC<ICurdPage> = ({
           shape="round"
           onClick={() => {
             setQuery({});
+            setPage({ current: 1, pageSize: default_pageSize });
           }}
         >
           重置
@@ -803,7 +829,7 @@ const CurdPage: FC<ICurdPage> = ({
             initialValues={entityData}
             name={pageStatus + '_' + subPageStatus}
             {...formLayout}
-            onFinish={addSubmitClick}
+            onFinish={pageSubmitClick}
             autoComplete="off"
           >
             {fieldNodes}

@@ -73,14 +73,25 @@ const CmsUser: FC = (props: any) => {
       code: 'email',
       type: 'string',
       style: { search: { display: false }, table: { display: false } },
-      rules: [{ type: 'string', max: 50 }],
+      rules: [
+        { type: 'string', max: 50 },
+        {
+          pattern: '^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$',
+          message: '用户邮箱格式不正确',
+        },
+      ],
     },
     {
       name: '手机号码',
-      code: 'phoneNumber',
+      code: 'phone',
       type: 'string',
       style: { search: { display: false }, table: { display: false } },
-      rules: [{ type: 'string', max: 11 }],
+      rules: [
+        {
+          pattern: '^(13[0-9]|14[5|7]|15[0-9]|18[0-9])\\d{8}$',
+          message: '手机号码格式不正确',
+        },
+      ],
     },
     {
       name: '用户性别',

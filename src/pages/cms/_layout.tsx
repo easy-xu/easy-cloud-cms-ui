@@ -41,20 +41,23 @@ const CmsLayout: FC<IRouteComponentProps> = ({
   const [notAuth, setNotAuth] = useState<boolean>(false);
   const [small, setSmall] = useState<boolean>(false);
 
-  const menuTreeRequest = useRequest(() => baseTree('cms', 'menu', {}), {
-    manual: true,
-    onSuccess: (data) => {
-      setMenuTree(data);
-      const paths = getPath(data, '/cms');
-      //判断是否分配菜单
-      if (
-        paths.indexOf(location.pathname) == -1 &&
-        location.pathname != '/cms'
-      ) {
-        setNotAuth(true);
-      }
+  const menuTreeRequest = useRequest(
+    () => baseTree('cms', 'menu', { userNo: user.userNo }),
+    {
+      manual: true,
+      onSuccess: (data) => {
+        setMenuTree(data);
+        const paths = getPath(data, '/cms');
+        //判断是否分配菜单
+        if (
+          paths.indexOf(location.pathname) == -1 &&
+          location.pathname != '/cms'
+        ) {
+          setNotAuth(true);
+        }
+      },
     },
-  });
+  );
 
   useEffect(() => {
     menuTreeRequest.run();

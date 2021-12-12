@@ -4,6 +4,7 @@ import AuthEntityPage from '@/components/AuthEntityPage';
 import { useRequest } from 'umi';
 import { baseList, baseTree } from '@/services/base';
 import { toTreeData, toListData } from '@/utils/baseUtil';
+import { jobRun } from '@/services/job';
 
 const JobConfig: FC = (props: any) => {
   const fields: IFields = [
@@ -38,7 +39,7 @@ const JobConfig: FC = (props: any) => {
     {
       name: '任务参数',
       code: 'params',
-      type: 'string',
+      type: 'textarea',
       style: { search: { display: false } },
       rules: [{ type: 'string', max: 500 }],
     },
@@ -50,6 +51,15 @@ const JobConfig: FC = (props: any) => {
     },
   ];
 
+  const jobRunRequest = useRequest((params) => jobRun(params), {
+    manual: true,
+    onSuccess: (data) => {},
+  });
+
+  const jobRunClick = (values?: any) => {
+    jobRunRequest.run({ id: values.id });
+  };
+
   return (
     <AuthEntityPage
       model="job"
@@ -57,6 +67,14 @@ const JobConfig: FC = (props: any) => {
       pageTitle="任务页面"
       fields={fields}
       option={['add', 'edit', 'delete']}
+      extendOption={[
+        {
+          key: 'run',
+          name: '执行',
+          requireAuth: 'edit',
+          onClick: jobRunClick,
+        },
+      ]}
     />
   );
 };

@@ -24,7 +24,7 @@ const CmsGroup: FC = (props: any) => {
     {
       name: '备注',
       code: 'remark',
-      type: 'string',
+      type: 'textarea',
       style: { search: { display: false }, table: { display: false } },
       rules: [{ type: 'string', max: 500 }],
     },

@@ -53,7 +53,7 @@ const JobLog: FC = (props: any) => {
     {
       name: '执行结果描述',
       code: 'execContent',
-      type: 'string',
+      type: 'textarea',
       style: { search: { display: false } },
       rules: [{ type: 'string', max: 65535 }],
     },

@@ -67,7 +67,7 @@ const AuthEntityPage: FC<ICurdPage> = (props) => {
       name: '其他分组权限',
       code: 'otherMode',
       type: 'select',
-      initial: '-',
+      initial: 'r',
       select: [
         { code: 'r', name: '可读' },
         { code: 'w', name: '可读可写' },

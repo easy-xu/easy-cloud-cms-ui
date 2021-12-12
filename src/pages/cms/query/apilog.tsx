@@ -71,7 +71,7 @@ const SysApiLog: FC = (props: any) => {
     {
       name: '结果描述',
       code: 'responseMessage',
-      type: 'string',
+      type: 'textarea',
       style: { search: { display: false } },
       rules: [{ type: 'string', max: 65535 }],
     },
