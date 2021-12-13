@@ -4,7 +4,7 @@ import AuthEntityPage from '@/components/AuthEntityPage';
 import { useRequest } from 'umi';
 import { baseList, baseTree } from '@/services/base';
 import { toTreeData, toListData } from '@/utils/baseUtil';
-import { jobRun } from '@/services/job';
+import { jobRun, jobStart, jobStop } from '@/services/job';
 
 const JobConfig: FC = (props: any) => {
   const fields: IFields = [
@@ -51,13 +51,29 @@ const JobConfig: FC = (props: any) => {
     },
   ];
 
-  const jobRunRequest = useRequest((params) => jobRun(params), {
+  const jobRunRequest = useRequest((id: number) => jobRun({ id: id }), {
     manual: true,
     onSuccess: (data) => {},
   });
 
   const jobRunClick = (values?: any) => {
-    jobRunRequest.run({ id: values.id });
+    jobRunRequest.run(values.id);
+  };
+  const jobStartRequest = useRequest((id: number) => jobStart({ id: id }), {
+    manual: true,
+    onSuccess: (data) => {},
+  });
+
+  const jobStartClick = (values?: any) => {
+    jobStartRequest.run(values.id);
+  };
+  const jobStopRequest = useRequest((id: number) => jobStop({ id: id }), {
+    manual: true,
+    onSuccess: (data) => {},
+  });
+
+  const jobStopClick = (values?: any) => {
+    jobStopRequest.run(values.id);
   };
 
   return (
@@ -73,6 +89,18 @@ const JobConfig: FC = (props: any) => {
           name: '执行',
           requireAuth: 'edit',
           onClick: jobRunClick,
+        },
+        {
+          key: 'start',
+          name: '开始',
+          requireAuth: 'edit',
+          onClick: jobStartClick,
+        },
+        {
+          key: 'stop',
+          name: '停止',
+          requireAuth: 'edit',
+          onClick: jobStopClick,
         },
       ]}
     />
