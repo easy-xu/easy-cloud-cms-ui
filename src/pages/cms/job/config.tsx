@@ -30,13 +30,6 @@ const JobConfig: FC = (props: any) => {
       rules: [{ type: 'string', max: 60 }],
     },
     {
-      name: '任务方法名',
-      code: 'methodName',
-      type: 'string',
-      style: { search: { display: false } },
-      rules: [{ type: 'string', max: 60 }],
-    },
-    {
       name: '任务参数',
       code: 'params',
       type: 'textarea',
@@ -44,16 +37,48 @@ const JobConfig: FC = (props: any) => {
       rules: [{ type: 'string', max: 500 }],
     },
     {
+      name: '执行状态',
+      code: ['trigger', 'state'],
+      type: 'select',
+      //NONE, NORMAL, PAUSED, COMPLETE, ERROR, BLOCKED
+      select: [
+        { code: 'NONE', name: '停止', color: 'gray' },
+        { code: 'NORMAL', name: '正常', color: 'green' },
+        { code: 'PAUSED', name: '暂停', color: 'yellow' },
+        { code: 'COMPLETE', name: '完成', color: 'green' },
+        { code: 'ERROR', name: '错误', color: 'red' },
+        { code: 'BLOCKED', name: '等待', color: 'yellow' },
+      ],
+      style: {
+        search: { display: false },
+        add: { display: false },
+        edit: { display: false },
+      },
+    },
+    {
       name: '最后触发时间',
-      code: 'lastTrigger',
+      code: ['trigger', 'previousFireTime'],
       type: 'datetime',
-      style: { search: { display: false } },
+      style: {
+        search: { display: false },
+        add: { display: false },
+        edit: { display: false },
+      },
+    },
+    {
+      name: '下次触发时间',
+      code: ['trigger', 'nextFireTime'],
+      type: 'datetime',
+      style: {
+        search: { display: false },
+        add: { display: false },
+        edit: { display: false },
+      },
     },
   ];
 
   const jobRunRequest = useRequest((id: number) => jobRun({ id: id }), {
     manual: true,
-    onSuccess: (data) => {},
   });
 
   const jobRunClick = (values?: any) => {
@@ -61,7 +86,6 @@ const JobConfig: FC = (props: any) => {
   };
   const jobStartRequest = useRequest((id: number) => jobStart({ id: id }), {
     manual: true,
-    onSuccess: (data) => {},
   });
 
   const jobStartClick = (values?: any) => {
@@ -69,7 +93,6 @@ const JobConfig: FC = (props: any) => {
   };
   const jobStopRequest = useRequest((id: number) => jobStop({ id: id }), {
     manual: true,
-    onSuccess: (data) => {},
   });
 
   const jobStopClick = (values?: any) => {

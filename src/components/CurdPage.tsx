@@ -1,4 +1,4 @@
-import { FC, ReactElement, useEffect, useState } from 'react';
+import { FC, ReactElement, SetStateAction, useEffect, useState } from 'react';
 import {
   InputNumber,
   Form,
@@ -71,8 +71,8 @@ export declare type Breakpoint = 'xxl' | 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
 export declare type IField = {
   subPage?: string;
-  name?: string;
-  code?: string;
+  name: string;
+  code: string | string[];
   type?: string;
   initial?: any;
   responsive?: Breakpoint[];
@@ -205,29 +205,29 @@ const CurdPage: FC<ICurdPage> = ({
   };
   //新增或保存
   const addEntiyRequest = useRequest(
-    (params) => addEntityApi(model, entity, params),
+    (params: any) => addEntityApi(model, entity, params),
     {
       manual: true,
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         doReSearch();
       },
     },
   );
   const editEntiyRequest = useRequest(
-    (params) => editEntityApi(model, entity, params),
+    (params: any) => editEntityApi(model, entity, params),
     {
       manual: true,
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         doReSearch();
       },
     },
   );
   //分页查询
   const pageListRequest = useRequest(
-    (page, query) => pageListApi(model, entity, page, query),
+    (page: IPage, query: any) => pageListApi(model, entity, page, query),
     {
       manual: true,
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setPage(data.page);
         setRecords(data.records);
       },
@@ -235,10 +235,10 @@ const CurdPage: FC<ICurdPage> = ({
   );
   //主键查询
   const queryEntityRequest = useRequest(
-    (id) => queryEntityApi(model, entity, id),
+    (id: number) => queryEntityApi(model, entity, id),
     {
       manual: true,
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setEntityData(data);
         //设置父组件数据
         extendData?.forEach((item: any) => {
@@ -252,10 +252,10 @@ const CurdPage: FC<ICurdPage> = ({
   );
   //主键删除
   const deleteEntityRequest = useRequest(
-    (id) => deleteEntityApi(model, entity, id),
+    (id: number) => deleteEntityApi(model, entity, id),
     {
       manual: true,
-      onSuccess: (data) => {
+      onSuccess: (data: any) => {
         setSelectedRowKeys([]);
         setDeleteConfirmVisible(false);
         pageListRequest.run(page, query);
@@ -269,7 +269,7 @@ const CurdPage: FC<ICurdPage> = ({
   //查询操作权限
   const optionAuthRequest = useRequest(() => queryOptionAuthApi(entity), {
     manual: true,
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setOptionAuth(data);
     },
   });
@@ -503,11 +503,13 @@ const CurdPage: FC<ICurdPage> = ({
       content = <Input readOnly={disable} />;
     }
 
+    const key = item.code.toString();
+
     const formItemNode = (
       <Form.Item
         label={item.name}
         name={item.code}
-        key={item.code}
+        key={key}
         hidden={hidden}
         initialValue={pageStatus == 'search' ? undefined : item.initial}
         rules={pageStatus == 'search' ? [] : item.rules}
@@ -529,7 +531,7 @@ const CurdPage: FC<ICurdPage> = ({
         return false;
       };
       return (
-        <Form.Item key={item.code} noStyle shouldUpdate={shouldUpdate}>
+        <Form.Item key={key} noStyle shouldUpdate={shouldUpdate}>
           {({ getFieldValue }) => {
             for (const key in condition) {
               if (condition[key].indexOf(getFieldValue(key)) == -1) {
