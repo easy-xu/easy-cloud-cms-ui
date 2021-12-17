@@ -4,7 +4,7 @@ import AuthEntityPage from '@/components/AuthEntityPage';
 import { useRequest } from 'umi';
 import { baseList, baseTree } from '@/services/base';
 import { toTreeData, toListData } from '@/utils/baseUtil';
-import { jobRun, jobStart, jobStop } from '@/services/job';
+import { jobOption } from '@/services/job';
 
 const JobConfig: FC = (props: any) => {
   const fields: IFields = [
@@ -21,6 +21,16 @@ const JobConfig: FC = (props: any) => {
       type: 'string',
       style: { search: { display: false } },
       rules: [{ required: true }, { type: 'string', max: 60 }],
+    },
+    {
+      name: '处理器',
+      code: 'invoker',
+      type: 'select',
+      select: [{ code: 'SpringJobInvoker', name: '默认处理器' }],
+      style: {
+        search: { display: false },
+      },
+      rules: [{ required: true }],
     },
     {
       name: '任务类名',
@@ -77,26 +87,31 @@ const JobConfig: FC = (props: any) => {
     },
   ];
 
-  const jobRunRequest = useRequest((id: number) => jobRun({ id: id }), {
-    manual: true,
-  });
+  const [queryVersion, setQueryVersion] = useState<string>();
+
+  const jobOptionRequest = useRequest(
+    (option: string, id: number) => jobOption(option, { id: id }),
+    {
+      manual: true,
+      onSuccess: () => {
+        setQueryVersion(new Date().toString());
+      },
+    },
+  );
 
   const jobRunClick = (values?: any) => {
-    jobRunRequest.run(values.id);
+    jobOptionRequest.run('run', values.id);
   };
-  const jobStartRequest = useRequest((id: number) => jobStart({ id: id }), {
-    manual: true,
-  });
 
   const jobStartClick = (values?: any) => {
-    jobStartRequest.run(values.id);
+    jobOptionRequest.run('start', values.id);
   };
-  const jobStopRequest = useRequest((id: number) => jobStop({ id: id }), {
-    manual: true,
-  });
+  const jobPauseClick = (values?: any) => {
+    jobOptionRequest.run('pause', values.id);
+  };
 
   const jobStopClick = (values?: any) => {
-    jobStopRequest.run(values.id);
+    jobOptionRequest.run('stop', values.id);
   };
 
   return (
@@ -106,7 +121,15 @@ const JobConfig: FC = (props: any) => {
       pageTitle="任务页面"
       fields={fields}
       option={['add', 'edit', 'delete']}
+      queryVersion={queryVersion}
       extendOption={[
+        {
+          key: 'start',
+          props: { type: 'primary' },
+          name: '开启',
+          requireAuth: 'edit',
+          onClick: jobStartClick,
+        },
         {
           key: 'run',
           name: '执行',
@@ -114,13 +137,14 @@ const JobConfig: FC = (props: any) => {
           onClick: jobRunClick,
         },
         {
-          key: 'start',
-          name: '开始',
+          key: 'pause',
+          name: '暂停',
           requireAuth: 'edit',
-          onClick: jobStartClick,
+          onClick: jobPauseClick,
         },
         {
           key: 'stop',
+          props: { danger: true },
           name: '停止',
           requireAuth: 'edit',
           onClick: jobStopClick,

@@ -118,6 +118,7 @@ export declare type ICurdPage = {
   extendData?: any[];
   extendOption?: any[];
   extendOptionPage?: any;
+  queryVersion?: string;
 };
 
 //表单布局样式
@@ -158,6 +159,7 @@ const CurdPage: FC<ICurdPage> = ({
   extendData = [],
   extendOption = [],
   extendOptionPage,
+  queryVersion,
 }) => {
   const initPata = {
     current: 1,
@@ -279,7 +281,7 @@ const CurdPage: FC<ICurdPage> = ({
   useEffect(() => {
     optionAuthRequest.run();
     pageListRequest.run(page, query);
-  }, []);
+  }, [queryVersion]);
 
   useEffect(() => {
     if (!query || Object.keys(query).length == 0) {
@@ -496,7 +498,7 @@ const CurdPage: FC<ICurdPage> = ({
     }
     //文本域
     else if (item.type == 'textarea') {
-      content = <Input.TextArea readOnly={disable} />;
+      content = <Input.TextArea rows={3} readOnly={disable} />;
     }
     //默认普通输入框
     else {
@@ -511,7 +513,7 @@ const CurdPage: FC<ICurdPage> = ({
         name={item.code}
         key={key}
         hidden={hidden}
-        initialValue={pageStatus == 'search' ? undefined : item.initial}
+        initialValue={pageStatus == 'add' ? item.initial : undefined}
         rules={pageStatus == 'search' ? [] : item.rules}
       >
         {content}
@@ -591,6 +593,8 @@ const CurdPage: FC<ICurdPage> = ({
         title: item.name,
         dataIndex: item.code,
         key: item.code,
+        //自动省略
+        ellipsis: true,
         responsive: responsive,
         render: (text: any, record: any) => {
           //选择类型回显
@@ -771,6 +775,7 @@ const CurdPage: FC<ICurdPage> = ({
   const extendOptionButton = extendOption.map((item) => {
     return optionAuth.indexOf(item.requireAuth) > -1 ? (
       <Button
+        {...item.props}
         key={item.key}
         disabled={selectedRowKeys.length != 1}
         shape="round"

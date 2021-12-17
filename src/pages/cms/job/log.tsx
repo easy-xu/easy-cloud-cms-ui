@@ -23,6 +23,13 @@ const JobLog: FC = (props: any) => {
       rules: [{ required: true }],
     },
     {
+      name: '流水号',
+      code: 'requestId',
+      type: 'string',
+      style: { search: { display: true } },
+      rules: [{ required: true }],
+    },
+    {
       name: '日志分类',
       code: 'type',
       type: 'select',
@@ -31,7 +38,7 @@ const JobLog: FC = (props: any) => {
         { code: 'S', name: '系统' },
         { code: 'U', name: '用户' },
       ],
-      style: { search: { display: false } },
+      style: { search: { display: true } },
     },
     {
       name: '执行时间',
